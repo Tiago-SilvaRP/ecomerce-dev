@@ -1,8 +1,13 @@
 :root {
-    --cor-neutra-escura: #111111;
-    --cor-neutra-clara: #ffffff;
+    /* CORES PRINCIPAIS */
     --cor-primaria: #6528D3;
     --cor-primaria-hover: #834de8;
+
+    /* CORES NEUTRAS*/
+    --cor-neutra-escura: #111111;
+    --cor-neutra-clara: #ffffff;
+    --cor-cinza-escura: #29272a;
+    --cor-cinza-clara: #ededed;
 }
 
 body {
