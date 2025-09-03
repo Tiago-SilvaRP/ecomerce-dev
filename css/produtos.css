@@ -21,6 +21,10 @@ main .produtos ul {
 main .produtos .produto {
     max-width: 368px;
     border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--cor-cinza-escura);
 }
 
 main .produtos img {
@@ -48,6 +52,7 @@ main .info {
     flex-direction: column;
     gap: 8px;
     padding: 0 24px 24px;
+    border-radius: 0 0 14px 14px;
 }
 
 main .info span,
@@ -69,6 +74,8 @@ main .info .preco {
 main .info .add-ao-carrinho {
     background-color: var(--cor-primaria);
     border: none;
+    font-size: 1.2rem;
+    letter-spacing: 0.1rem;
     border-radius: 8px;
     color: var(--cor-neutra-clara);
     padding: 16px;
@@ -80,11 +87,12 @@ main .info .add-ao-carrinho:hover {
     background-color: var(--cor-primaria-hover)
 }
 
-@media(min-width: 769px) {
+@media(min-width: 768px) {
     main .produtos ul {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
+        align-items: stretch;
         gap: 32px;
     }
 
