@@ -19,41 +19,42 @@ Objetivo 3 - atualizar valores do carrinho:
 const btnAdicionarCarrinho = document.querySelectorAll(".add-ao-carrinho");
 const contadorCarrinho = document.getElementById("contador-carrinho");
 
+function addItemNoCarrinho(evento) {
+    //pegar as informações do produto
+    const elementoProduto = evento.target.closest(".produto");
+    const produtoId = elementoProduto.dataset.id;
+    const produtoNome = elementoProduto.querySelector(".nome-produto").textContent.trim();
+    const produtoImagem = elementoProduto.querySelector("img").getAttribute("src");
+    const produtoPreco = parseFloat(elementoProduto?.querySelector(".preco").textContent.replace("R$ ", "").replace(".", "").replace(",", ".").trim());
+
+    const produto = {
+        id: produtoId,
+        nome: produtoNome,
+        imagem: produtoImagem,
+        preco: produtoPreco,
+        quantidade: 1
+    }
+
+    //buscar lista de produtos localstorage
+    const carrinho = obterProdutosDoCarrinho("carrinho");
+    //testar se o produto já está no carrinho
+    produtoExisteNoCarrinho(carrinho, produto);
+    salvarProdutosNoCarrinho("carrinho", carrinho)
+}
+
 btnAdicionarCarrinho.forEach(btn => {
-    btn.addEventListener("click", (evento) => {
-        const elementoProduto = evento.target.closest(".produto");
-        const produtoId = elementoProduto.dataset.id;
-        const produtoNome = elementoProduto.querySelector(".nome-produto").textContent.trim();
-        const produtoImagem = elementoProduto.querySelector("img").getAttribute("src");
-        const produtoPreco = parseFloat(elementoProduto?.querySelector(".preco").textContent.replace("R$ ", "").replace(".", "").replace(",", ".").trim());
-
-        //buscar lista de produtos localstorage
-        const carrinho = obterProdutosDoCarrinho();
-
-        //testar se o produto já está no carrinho
-        const existeProduto = carrinho.find(item => item.id === produtoId);
-        if (existeProduto) {
-            existeProduto.quantidade += 1;
-        } else {
-            const produto = {
-                id: produtoId,
-                nome: produtoNome,
-                imagem: produtoImagem,
-                preco: produtoPreco,
-                quantidade: 1
-            }
-            carrinho.push(produto);
-        }
-        salvarProdutosNoCarrinho("carrinho", carrinho)
-    })
-});
+    btn.addEventListener("click", addItemNoCarrinho);
+})
 
 function salvarProdutosNoCarrinho(key, dados) {
     localStorage.setItem(key, JSON.stringify(dados));
 }
 
-function obterProdutosDoCarrinho() {
-    const produtos = localStorage.getItem("carrinho");
-    return produtos ? JSON.parse(produtos) : [];
+function obterProdutosDoCarrinho(key) {
+    return JSON.parse(localStorage.getItem(key)) || [];
+}
 
+function produtoExisteNoCarrinho(carrinho, novoProduto) {
+    const itemExiste = carrinho.find(item => item.id === novoProduto.id);
+    itemExiste ? itemExiste.quantidade += 1 : carrinho.push(novoProduto);
 }
