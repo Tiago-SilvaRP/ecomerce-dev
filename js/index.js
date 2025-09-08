@@ -1,68 +1,30 @@
-/*
-Objetivo 1 - quando clicar no botão de adicionar ao carrinho:
-    - atualizar o contador
-    - adicionar o produto no localStorage
-    - atualizar a tabela HTML do carrinho
-
-Objetivo 2 - remover produtos do carrinho:
-    - ouvir o botão de deletar
-    - remover do localStorage
-    - atualizar o DOM e o total
-
-Objetivo 3 - atualizar valores do carrinho:
-    - ouvir mudanças de quantidade
-    - recalcular total individual
-    - recalcular total geral
-*/
-
-// Objetivo 1 - quando clicar no botão de adicionar ao carrinho:
 const btnAdicionarCarrinho = document.querySelectorAll(".add-ao-carrinho");
 const contadorCarrinho = document.getElementById("contador-carrinho");
 
+btnAdicionarCarrinho.forEach(btn => {
+    btn.addEventListener("click", addItemNoCarrinho);
+});
+
 function addItemNoCarrinho(evento) {
-    //pegar as informações do produto
     const elementoProduto = evento.target.closest(".produto");
     const produtoId = elementoProduto.dataset.id;
     const produtoNome = elementoProduto.querySelector(".nome-produto").textContent.trim();
     const produtoImagem = elementoProduto.querySelector("img").getAttribute("src");
-    const produtoTamanho = tamanhoProduto(elementoProduto);
     const produtoPreco = parseFloat(elementoProduto?.querySelector(".preco").textContent.replace("R$ ", "").replace(".", "").replace(",", ".").trim());
-    const produtoCor = corProduto(elementoProduto);
 
     const produto = {
         id: produtoId,
         nome: produtoNome,
         imagem: produtoImagem,
-        cor: produtoCor,
-        tamanho: produtoTamanho,
         preco: produtoPreco,
         quantidade: 1
-    }
+    };
 
-    //buscar lista de produtos localstorage
     const carrinho = obterProdutosDoCarrinho("carrinho");
-    //testar se o produto já está no carrinho
     produtoExisteNoCarrinho(carrinho, produto);
     salvarProdutosNoCarrinho("carrinho", carrinho);
-    atualizarContadorDoCarrinho();
-    renderizerTabelaCarrinho()
+    atualizarCarrinhoEtabela();
 }
-
-function tamanhoProduto(tamanhoDoProduto) {
-    const tamanhoElemento = tamanhoDoProduto.querySelector(".tamanho");
-    return tamanhoElemento ? tamanhoElemento.textContent
-        .toLowerCase().replace("tamanho:", "").trim().toUpperCase() : undefined;
-}
-
-function corProduto(corDoProduto) {
-    const corElemento = corDoProduto.querySelector(".cor");
-    return corElemento ? corElemento.textContent
-        .toLowerCase().replace("cor:", "").trim() : undefined;
-}
-
-btnAdicionarCarrinho.forEach(btn => {
-    btn.addEventListener("click", addItemNoCarrinho);
-})
 
 function salvarProdutosNoCarrinho(key, dados) {
     localStorage.setItem(key, JSON.stringify(dados));
@@ -105,10 +67,12 @@ function renderizerTabelaCarrinho() {
                     R$ ${produto.preco.toFixed(2).replace(".", ",")}
                 </td>
                 <td class="td-quantidade">
-                    <input type="number" value="${produto.quantidade}" min="1">
+                    <input type="number" class="input-quantidade" 
+                    data-id="${produto.id}"
+                    value="${produto.quantidade}" min="1">
                 </td>
                 <td class="td-preco-total">
-                    R$ ${produto.preco.toFixed(2).replace(".", ",")}</td>
+                    R$ ${(produto.preco * produto.quantidade).toFixed(2).replace(".", ",")}</td>
                 <td>
                     <button class="btn-remover"
                         data-id="${produto.id}" id="deletar">
@@ -117,7 +81,7 @@ function renderizerTabelaCarrinho() {
 
         corpoTabela.append(tr);
     });
-}
+};
 
 const corpoTabela = document.getElementById("tbody");
 corpoTabela.addEventListener("click", event => {
@@ -127,11 +91,56 @@ corpoTabela.addEventListener("click", event => {
     };
 });
 
+corpoTabela.addEventListener("input", event => {
+    if (event.target.classList.contains("input-quantidade")) {
+        const produtos = obterProdutosDoCarrinho("carrinho");
+        const produto = produtos.find(produto => produto.id === event.target.dataset.id);
+        let novaQuantidade = parseInt(event.target.value);
+        if (produto) {
+            produto.quantidade = novaQuantidade;
+        }
+        salvarProdutosNoCarrinho("carrinho", produtos);
+        atualizarCarrinhoEtabela();
+    }
+});
+
 function removerProdutoDoCarrinho(id) {
     const produtos = obterProdutosDoCarrinho("carrinho");
     const carrinhoAtualizado = produtos.filter(produto => produto.id !== id);
 
     salvarProdutosNoCarrinho("carrinho", carrinhoAtualizado);
+    atualizarCarrinhoEtabela();
+};
+
+function atualizarValorTotalDoCarrinho() {
+    const produtos = obterProdutosDoCarrinho("carrinho");
+    let total = 0;
+    produtos.forEach(produto => {
+        total += produto.preco * produto.quantidade;
+    });
+    document.getElementById("total-carrinho").textContent = `R$ ${total.toFixed(2).replace(".", ",")}`;
+};
+
+function atualizarCarrinhoEtabela() {
     atualizarContadorDoCarrinho();
     renderizerTabelaCarrinho();
+    atualizarValorTotalDoCarrinho();
 };
+
+atualizarCarrinhoEtabela();
+
+function abrirFecharCarrinho() {
+    const btnCart = document.querySelector(".botao-carrinho");
+    btnCart.addEventListener("click", () => {
+        const modal = document.getElementById("modal-1");
+        modal.classList.add("is-open");
+    });
+
+    const fecharModal = document.querySelector(".fechar");
+    fecharModal.addEventListener("click", () => {
+        const modal = document.getElementById("modal-1");
+        modal.classList.remove("is-open");
+    });
+};
+
+abrirFecharCarrinho();
