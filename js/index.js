@@ -82,7 +82,6 @@ function renderizerTabelaCarrinho() {
     `).join("");
 }
 
-
 const corpoTabela = document.getElementById("tbody");
 corpoTabela.addEventListener("click", event => {
     if (event.target.classList.contains("btn-remover")) {
@@ -129,19 +128,3 @@ function atualizarCarrinhoEtabela() {
 };
 
 atualizarCarrinhoEtabela();
-
-function abrirFecharCarrinho() {
-    const btnCart = document.querySelector(".botao-carrinho");
-    btnCart.addEventListener("click", () => {
-        const modal = document.getElementById("modal-1");
-        modal.classList.add("is-open");
-    });
-
-    const fecharModal = document.querySelector(".fechar");
-    fecharModal.addEventListener("click", () => {
-        const modal = document.getElementById("modal-1");
-        modal.classList.remove("is-open");
-    });
-};
-
-abrirFecharCarrinho();
