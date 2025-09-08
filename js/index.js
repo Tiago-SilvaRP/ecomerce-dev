@@ -24,20 +24,20 @@ function addItemNoCarrinho(evento) {
     produtoExisteNoCarrinho(carrinho, produto);
     salvarProdutosNoCarrinho("carrinho", carrinho);
     atualizarCarrinhoEtabela();
-}
+};
 
 function salvarProdutosNoCarrinho(key, dados) {
     localStorage.setItem(key, JSON.stringify(dados));
-}
+};
 
 function obterProdutosDoCarrinho(key) {
     return JSON.parse(localStorage.getItem(key)) || [];
-}
+};
 
 function produtoExisteNoCarrinho(carrinho, novoProduto) {
     const itemExiste = carrinho.find(item => item.id === novoProduto.id);
     itemExiste ? itemExiste.quantidade += 1 : carrinho.push(novoProduto);
-}
+};
 
 function atualizarContadorDoCarrinho() {
     const carrinho = obterProdutosDoCarrinho("carrinho");
@@ -45,43 +45,43 @@ function atualizarContadorDoCarrinho() {
     carrinho.forEach(item => total += item.quantidade);
 
     document.getElementById("contador-carrinho").textContent = total;
-}
+};
 
 atualizarContadorDoCarrinho();
 
 function renderizerTabelaCarrinho() {
     const produtosCarrinho = obterProdutosDoCarrinho("carrinho");
     const corpoTabela = document.getElementById("tbody");
-    corpoTabela.innerHTML = "";
 
-    produtosCarrinho.forEach(produto => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td class="td-produto">
-                    <img 
-                        src="${produto.imagem}"
-                        alt="${produto.nome}"
-                    />
-                </td>
-                <td>${produto.nome}</td>
-                <td class="td-preco-unitario">
-                    R$ ${produto.preco.toFixed(2).replace(".", ",")}
-                </td>
-                <td class="td-quantidade">
-                    <input type="number" class="input-quantidade" 
-                    data-id="${produto.id}"
-                    value="${produto.quantidade}" min="1">
-                </td>
-                <td class="td-preco-total">
-                    R$ ${(produto.preco * produto.quantidade).toFixed(2).replace(".", ",")}</td>
-                <td>
-                    <button class="btn-remover"
-                        data-id="${produto.id}" id="deletar">
-                    </button>
-                </td>`
+    corpoTabela.innerHTML = produtosCarrinho.map(produto => `
+    <tr>
+        <td class="td-produto">
+            <img src="${produto.imagem}" 
+                alt="${produto.nome}" 
+            />
+        </td>
+        <td>${produto.nome}</td>
+        <td class="td-preco-unitario">
+            R$ ${produto.preco.toFixed(2).replace(".", ",")}
+        </td>
+        <td class="td-quantidade">
+            <input type="number" class="input-quantidade" 
+                data-id="${produto.id}" 
+                value="${produto.quantidade}" min="1"
+            >
+        </td>
+        <td class="td-preco-total">
+          R$ ${(produto.preco * produto.quantidade).toFixed(2).replace(".", ",")}
+        </td>
+        <td>
+            <button class="btn-remover" 
+                data-id="${produto.id}" id="deletar">
+            </button>
+        </td>
+    </tr>
+    `).join("");
+}
 
-        corpoTabela.append(tr);
-    });
-};
 
 const corpoTabela = document.getElementById("tbody");
 corpoTabela.addEventListener("click", event => {
@@ -114,10 +114,11 @@ function removerProdutoDoCarrinho(id) {
 
 function atualizarValorTotalDoCarrinho() {
     const produtos = obterProdutosDoCarrinho("carrinho");
-    let total = 0;
-    produtos.forEach(produto => {
-        total += produto.preco * produto.quantidade;
-    });
+
+    const total = produtos.reduce((soma, produto) => {
+        return soma + (produto.preco * produto.quantidade);
+    }, 0);
+
     document.getElementById("total-carrinho").textContent = `R$ ${total.toFixed(2).replace(".", ",")}`;
 };
 
