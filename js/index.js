@@ -27,11 +27,13 @@ function addItemNoCarrinho(evento) {
     const produtoImagem = elementoProduto.querySelector("img").getAttribute("src");
     const produtoTamanho = tamanhoProduto(elementoProduto);
     const produtoPreco = parseFloat(elementoProduto?.querySelector(".preco").textContent.replace("R$ ", "").replace(".", "").replace(",", ".").trim());
+    const produtoCor = corProduto(elementoProduto);
 
     const produto = {
         id: produtoId,
         nome: produtoNome,
         imagem: produtoImagem,
+        cor: produtoCor,
         tamanho: produtoTamanho,
         preco: produtoPreco,
         quantidade: 1
@@ -49,6 +51,12 @@ function tamanhoProduto(tamanhoDoProduto) {
     const tamanhoElemento = tamanhoDoProduto.querySelector(".tamanho");
     return tamanhoElemento? tamanhoElemento.textContent
     .toLowerCase().replace("tamanho:", "").trim().toUpperCase() : undefined;
+}
+
+function corProduto(corDoProduto) {
+    const corElemento = corDoProduto.querySelector(".cor");
+    return corElemento? corElemento.textContent
+    .toLowerCase().replace("cor:", "").trim() : undefined;
 }
 
 btnAdicionarCarrinho.forEach(btn => {
