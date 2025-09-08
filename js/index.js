@@ -116,9 +116,22 @@ function renderizerTabelaCarrinho() {
                 </td>`
 
         corpoTabela.append(tr);
-        console.log(tr);
     });
-
-
 }
-renderizerTabelaCarrinho()
+
+const corpoTabela = document.getElementById("tbody");
+corpoTabela.addEventListener("click", event => {
+    if (event.target.classList.contains("btn-remover")) {
+        const id = event.target.dataset.id;
+        removerProdutoDoCarrinho(id);
+    };
+});
+
+function removerProdutoDoCarrinho(id) {
+    const produtos = obterProdutosDoCarrinho("carrinho");
+    const carrinhoAtualizado = produtos.filter(produto => produto.id !== id);
+
+    salvarProdutosNoCarrinho("carrinho", carrinhoAtualizado);
+    atualizarContadorDoCarrinho();
+    renderizerTabelaCarrinho();
+};
