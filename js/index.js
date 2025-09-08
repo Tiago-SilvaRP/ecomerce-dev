@@ -45,18 +45,19 @@ function addItemNoCarrinho(evento) {
     produtoExisteNoCarrinho(carrinho, produto);
     salvarProdutosNoCarrinho("carrinho", carrinho);
     atualizarContadorDoCarrinho();
+    renderizerTabelaCarrinho()
 }
 
 function tamanhoProduto(tamanhoDoProduto) {
     const tamanhoElemento = tamanhoDoProduto.querySelector(".tamanho");
-    return tamanhoElemento? tamanhoElemento.textContent
-    .toLowerCase().replace("tamanho:", "").trim().toUpperCase() : undefined;
+    return tamanhoElemento ? tamanhoElemento.textContent
+        .toLowerCase().replace("tamanho:", "").trim().toUpperCase() : undefined;
 }
 
 function corProduto(corDoProduto) {
     const corElemento = corDoProduto.querySelector(".cor");
-    return corElemento? corElemento.textContent
-    .toLowerCase().replace("cor:", "").trim() : undefined;
+    return corElemento ? corElemento.textContent
+        .toLowerCase().replace("cor:", "").trim() : undefined;
 }
 
 btnAdicionarCarrinho.forEach(btn => {
@@ -85,3 +86,39 @@ function atualizarContadorDoCarrinho() {
 }
 
 atualizarContadorDoCarrinho();
+
+function renderizerTabelaCarrinho() {
+    const produtosCarrinho = obterProdutosDoCarrinho("carrinho");
+    const corpoTabela = document.getElementById("tbody");
+    corpoTabela.innerHTML = "";
+
+    produtosCarrinho.forEach(produto => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td class="td-produto">
+                    <img 
+                        src="${produto.imagem}"
+                        alt="${produto.nome}"
+                    />
+                </td>
+                <td>${produto.nome}</td>
+                <td class="td-preco-unitario">
+                    R$ ${produto.preco.toFixed(2).replace(".", ",")}
+                </td>
+                <td class="td-quantidade">
+                    <input type="number" value="${produto.quantidade}" min="1">
+                </td>
+                <td class="td-preco-total">
+                    R$ ${produto.preco.toFixed(2).replace(".", ",")}</td>
+                <td>
+                    <button class="btn-remover"
+                        data-id="${produto.id}" id="deletar">
+                    </button>
+                </td>`
+
+        corpoTabela.append(tr);
+        console.log(tr);
+    });
+
+
+}
+renderizerTabelaCarrinho()
