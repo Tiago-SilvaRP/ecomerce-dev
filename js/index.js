@@ -25,12 +25,14 @@ function addItemNoCarrinho(evento) {
     const produtoId = elementoProduto.dataset.id;
     const produtoNome = elementoProduto.querySelector(".nome-produto").textContent.trim();
     const produtoImagem = elementoProduto.querySelector("img").getAttribute("src");
+    const produtoTamanho = tamanhoProduto(elementoProduto);
     const produtoPreco = parseFloat(elementoProduto?.querySelector(".preco").textContent.replace("R$ ", "").replace(".", "").replace(",", ".").trim());
 
     const produto = {
         id: produtoId,
         nome: produtoNome,
         imagem: produtoImagem,
+        tamanho: produtoTamanho,
         preco: produtoPreco,
         quantidade: 1
     }
@@ -39,7 +41,14 @@ function addItemNoCarrinho(evento) {
     const carrinho = obterProdutosDoCarrinho("carrinho");
     //testar se o produto já está no carrinho
     produtoExisteNoCarrinho(carrinho, produto);
-    salvarProdutosNoCarrinho("carrinho", carrinho)
+    salvarProdutosNoCarrinho("carrinho", carrinho);
+    atualizarContadorDoCarrinho();
+}
+
+function tamanhoProduto(tamanhoDoProduto) {
+    const tamanhoElemento = tamanhoDoProduto.querySelector(".tamanho");
+    return tamanhoElemento? tamanhoElemento.textContent
+    .toLowerCase().replace("tamanho:", "").trim().toUpperCase() : undefined;
 }
 
 btnAdicionarCarrinho.forEach(btn => {
@@ -58,3 +67,13 @@ function produtoExisteNoCarrinho(carrinho, novoProduto) {
     const itemExiste = carrinho.find(item => item.id === novoProduto.id);
     itemExiste ? itemExiste.quantidade += 1 : carrinho.push(novoProduto);
 }
+
+function atualizarContadorDoCarrinho() {
+    const carrinho = obterProdutosDoCarrinho("carrinho");
+    let total = 0;
+    carrinho.forEach(item => total += item.quantidade);
+
+    document.getElementById("contador-carrinho").textContent = total;
+}
+
+atualizarContadorDoCarrinho();
