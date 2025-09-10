@@ -80,7 +80,7 @@ function renderizerTabelaCarrinho() {
         </td>
     </tr>
     `).join("");
-}
+};
 
 const corpoTabela = document.getElementById("tbody");
 corpoTabela.addEventListener("click", event => {
