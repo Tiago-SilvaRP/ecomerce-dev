@@ -213,7 +213,23 @@
                     </table>
 
                     <div class="container-preco">
-                        <span class="total-carrinho" id="total-carrinho">Total: R$ 0,00</span>
+                        <div class="container-cep-frete">
+                            <label for="input-cep">Calcular Frete:</label>
+                            <div class="container-cep-inputs">
+                                <input type="text" class="input-cep" id="input-cep" placeholder="Digite seu CEP">
+                                <button class="btn-calcular-frete" id="btn-calcular-frete">Calcular Frete</button>
+                            </div>
+                        </div>
+                        <div class="container-preco-total">
+                            <span class="subtotal-pedidos" id="subtotal-pedidos">Subtotal dos pedidos:
+                                <span class="valor">R$: 100,00</span>
+                            </span>
+                            <span class="valor-frete" id="valor-frete">Valor do Frete:
+                                <span></span>
+                            </span>
+                            <span class="total-carrinho" id="total-carrinho">Total: 1200</span>
+                        </div>
+                        <!-- <span class="total-carrinho" id="total-carrinho">Total: R$ 0,00</span> -->
                         <button class="finalizar-compra">Finalizar Compra</button>
                     </div>
                 </div>

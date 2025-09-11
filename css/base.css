@@ -6,9 +6,11 @@
     /* CORES NEUTRAS*/
     --cor-neutra-escura: #111111;
     --cor-neutra-clara: #ffffff;
-    --cor-cinza-escura: #29272a;
     --cor-cinza-clara: #ededed;
+    --cor-cinza-meio-tom:#e0e0e0;
+    --cor-cinza-escura: #29272a;
     --cor-roxa-clara: #bca2ed;
+    --cor-verde-clara: #6addb7;
 }
 
 body {
