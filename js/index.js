@@ -133,6 +133,10 @@ atualizarCarrinhoEtabela();
 async function calcularFrete(cep) {
     const url = "https://jessica1914tj.app.n8n.cloud/webhook/0319a495-feff-44f8-ad02-0cbe5a039cb5";
 
+    const loading = document.getElementById("loading-frete");
+    loading.style.display = "inline";
+    btnCalcularFrete.disabled = true;
+
     try {
         const medidasResponse = await fetch("./js/medidas-produtos.json")
         const medidas = await medidasResponse.json()
@@ -160,12 +164,14 @@ async function calcularFrete(cep) {
         if (!resposta.ok) throw new Error("Erro ao calcular frete");
 
         const resultado = await resposta.json();
-        console.log(resultado);
 
         return resultado.price;
     } catch (erro) {
         console.log("Erro ao calcular frete:", erro);
         return null;
+    } finally {
+        loading.style.display = "none";
+        btnCalcularFrete.disabled = false;
     }
 };
 
@@ -188,11 +194,7 @@ btnCalcularFrete.addEventListener("click", async () => {
         erroCep.style.display = "none";
     }
 
-    const loading = document.getElementById("loading-frete");
-    loading.style.display = "inline";
-
     const valorFrete = await calcularFrete(cep);
-    loading.style.display = "none";
 
     if (valorFrete === null) {
         erroCep.textContent = "Erro ao calcular frete. Tente novamente.";
@@ -200,29 +202,35 @@ btnCalcularFrete.addEventListener("click", async () => {
         return;
     };
 
-    document.querySelector("#valor-frete .valor").textContent = 
+    document.querySelector("#valor-frete .valor").textContent =
         valorFrete.toLocaleString("pt-BR", {
-        style: "currency", currency: "BRL"
-    });
+            style: "currency", currency: "BRL"
+        });
     document.querySelector("#valor-frete").style.display = "flex";
 
+    somaValorFreteComSubTotal(valorFrete)
+});
+
+function somaValorFreteComSubTotal(valorFrete) {
     const subtotalElemento = document.querySelector("#subtotal-pedidos .valor");
 
-    let textoSubtotal = subtotalElemento.textContent.trim();
-    textoSubtotal = textoSubtotal.replace("R$", "").trim();
+    const textoSubtotal = subtotalElemento.textContent
+        .replace("R$", "")
+        .trim();
+
     const valorSubtotal = parseFloat(textoSubtotal
         .replace(/\./g, "")
-        .replace(",", "."));
+        .replace(",", ".")
+    );
 
     const totalComFrete = valorSubtotal + valorFrete;
-    const totalComFreteFormatado = totalComFrete
-        .toLocaleString('pt-BR', {
+    const totalComFreteFormatado = totalComFrete.toLocaleString('pt-BR', {
         style: 'currency', currency: 'BRL'
     });
 
     const totalCarrinhoElemento = document.getElementById("total-carrinho");
     totalCarrinhoElemento.textContent = `Total: ${totalComFreteFormatado}`;
-});
+};
 
 function validarCep(cep) {
     const regexCep = /^[0-9]{5}-?[0-9]{3}$/;
