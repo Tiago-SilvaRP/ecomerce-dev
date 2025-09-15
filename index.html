@@ -216,15 +216,18 @@
                             <label for="input-cep">Calcular Frete:</label>
                             <div class="container-cep-inputs">
                                 <input type="text" class="input-cep" id="input-cep" placeholder="Digite seu CEP">
+                                <span class="erro"></span>
                                 <button class="btn-calcular-frete" id="btn-calcular-frete">Calcular Frete</button>
                             </div>
                         </div>
                         <div class="container-preco-total">
                             <span class="subtotal-pedidos" id="subtotal-pedidos">Subtotal dos pedidos:
-                                <span class="valor">R$: 100,00</span>
+                                <span class="valor"></span>
+                            </span>
+                            <span class="loading-frete" id="loading-frete">Calculando frete<span class="dots"></span>
                             </span>
                             <span class="valor-frete" id="valor-frete">Valor do Frete:
-                                <span></span>
+                                <span class="valor"></span>
                             </span>
                             <span class="total-carrinho" id="total-carrinho">Total: 1200</span>
                         </div>

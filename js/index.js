@@ -119,6 +119,7 @@ function atualizarValorTotalDoCarrinho() {
     }, 0);
 
     document.getElementById("total-carrinho").textContent = `Total: R$ ${total.toFixed(2).replace(".", ",")}`;
+    document.querySelector("#subtotal-pedidos .valor").textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
 };
 
 function atualizarCarrinhoEtabela() {
@@ -128,3 +129,102 @@ function atualizarCarrinhoEtabela() {
 };
 
 atualizarCarrinhoEtabela();
+
+async function calcularFrete(cep) {
+    const url = "https://jessica1914tj.app.n8n.cloud/webhook/0319a495-feff-44f8-ad02-0cbe5a039cb5";
+
+    try {
+        const medidasResponse = await fetch("./js/medidas-produtos.json")
+        const medidas = await medidasResponse.json()
+        const produtos = obterProdutosDoCarrinho("carrinho");
+
+        const products = produtos.map(produto => {
+            const medida = medidas.find(m => m.id === produto.id);
+            return {
+                quantity: produto.quantidade,
+                height: medida ? medida.height : 4,
+                length: medida ? medida.length : 30,
+                width: medida ? medida.width : 25,
+                weight: medida ? medida.weight : 0.25
+            }
+        });
+
+        const resposta = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ cep, products })
+        });
+
+        if (!resposta.ok) throw new Error("Erro ao calcular frete");
+
+        const resultado = await resposta.json();
+        console.log(resultado);
+
+        return resultado.price;
+    } catch (erro) {
+        console.log("Erro ao calcular frete:", erro);
+        return null;
+    }
+};
+
+const btnCalcularFrete = document.getElementById("btn-calcular-frete");
+const inputCep = document.getElementById("input-cep");
+
+inputCep.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") btnCalcularFrete.click();
+});
+
+btnCalcularFrete.addEventListener("click", async () => {
+    const cep = inputCep.value.trim();
+    const erroCep = document.querySelector(".erro");
+
+    if (!validarCep(cep)) {
+        erroCep.textContent = "CEP inválido";
+        erroCep.style.display = "block";
+        return;
+    } else {
+        erroCep.style.display = "none";
+    }
+
+    const loading = document.getElementById("loading-frete");
+    loading.style.display = "inline";
+
+    const valorFrete = await calcularFrete(cep);
+    loading.style.display = "none";
+
+    if (valorFrete === null) {
+        erroCep.textContent = "Erro ao calcular frete. Tente novamente.";
+        erroCep.style.display = "block";
+        return;
+    };
+
+    document.querySelector("#valor-frete .valor").textContent = 
+        valorFrete.toLocaleString("pt-BR", {
+        style: "currency", currency: "BRL"
+    });
+    document.querySelector("#valor-frete").style.display = "flex";
+
+    const subtotalElemento = document.querySelector("#subtotal-pedidos .valor");
+
+    let textoSubtotal = subtotalElemento.textContent.trim();
+    textoSubtotal = textoSubtotal.replace("R$", "").trim();
+    const valorSubtotal = parseFloat(textoSubtotal
+        .replace(/\./g, "")
+        .replace(",", "."));
+
+    const totalComFrete = valorSubtotal + valorFrete;
+    const totalComFreteFormatado = totalComFrete
+        .toLocaleString('pt-BR', {
+        style: 'currency', currency: 'BRL'
+    });
+
+    const totalCarrinhoElemento = document.getElementById("total-carrinho");
+    totalCarrinhoElemento.textContent = `Total: ${totalComFreteFormatado}`;
+});
+
+function validarCep(cep) {
+    const regexCep = /^[0-9]{5}-?[0-9]{3}$/;
+    return regexCep.test(cep);
+};

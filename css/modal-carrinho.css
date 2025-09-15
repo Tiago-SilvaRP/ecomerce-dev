@@ -158,6 +158,31 @@ td .btn-remover {
     font-weight: 400;
 }
 
+.loading-frete {
+    display: none; 
+    color: var(--cor-verde-clara);
+    font-weight: 500;
+}
+
+.loading-frete .dots::after {
+    content: "";
+    animation: dots 1s infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: ""; }
+    40% { content: "."; }
+    60% { content: ".."; }
+    80%, 100% { content: "..."; }
+}
+
+.erro {
+    color:#ff4d4d;
+    font-size: 0.875rem;
+    margin-top: 4px;
+    display: none;
+}
+
 .container-cep-frete .btn-calcular-frete {
     padding: 8px 20px;
     border: 1px solid var(--cor-verde-clara);

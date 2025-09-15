@@ -1,0 +1,44 @@
+[
+    {
+        "id": "camisa-roxa-m",
+        "height": 3,
+        "width": 20,
+        "length": 30,
+        "weight": 0.25
+    },
+    {
+        "id": "camisa-roxa-p",
+        "height": 3,
+        "width": 20,
+        "length": 30,
+        "weight": 0.25
+    },
+    {
+        "id": "camisa-roxa-g",
+        "height": 3,
+        "width": 20,
+        "length": 30,
+        "weight": 0.25
+    },
+    {
+        "id": "camisa-roxa-gg",
+        "height": 3,
+        "width": 20,
+        "length": 30,
+        "weight": 0.25
+    },
+    {
+        "id": "camisa-roxa-eg",
+        "height": 3,
+        "width": 20,
+        "length": 30,
+        "weight": 0.25
+    },
+    {
+        "id": "caneca",
+        "height": 10,
+        "width": 12,
+        "length": 10,
+        "weight": 0.45
+    }
+]
