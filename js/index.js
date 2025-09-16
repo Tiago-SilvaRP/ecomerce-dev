@@ -1,6 +1,10 @@
-const btnAdicionarCarrinho = document.querySelectorAll(".add-ao-carrinho");
-const contadorCarrinho = document.getElementById("contador-carrinho");
+import { salvarProdutosNoCarrinho, atualizarCarrinhoEtabela, obterProdutosDoCarrinho, produtoExisteNoCarrinho, removerProdutoDoCarrinho } from "./services/carrinhoService.js";
+import { calcularFrete, somaValorFreteComSubTotal } from "./services/freteService.js";
+import { validarCep } from "./services/validadorCep.js";
 
+
+atualizarCarrinhoEtabela();
+const btnAdicionarCarrinho = document.querySelectorAll(".add-ao-carrinho");
 btnAdicionarCarrinho.forEach(btn => {
     btn.addEventListener("click", addItemNoCarrinho);
 });
@@ -26,61 +30,6 @@ function addItemNoCarrinho(evento) {
     atualizarCarrinhoEtabela();
 };
 
-function salvarProdutosNoCarrinho(key, dados) {
-    localStorage.setItem(key, JSON.stringify(dados));
-};
-
-function obterProdutosDoCarrinho(key) {
-    return JSON.parse(localStorage.getItem(key)) || [];
-};
-
-function produtoExisteNoCarrinho(carrinho, novoProduto) {
-    const itemExiste = carrinho.find(item => item.id === novoProduto.id);
-    itemExiste ? itemExiste.quantidade += 1 : carrinho.push(novoProduto);
-};
-
-function atualizarContadorDoCarrinho() {
-    const carrinho = obterProdutosDoCarrinho("carrinho");
-    const total = carrinho.reduce((soma, item) => soma + item.quantidade, 0)
-
-    document.getElementById("contador-carrinho").textContent = total;
-};
-
-atualizarContadorDoCarrinho();
-
-function renderizerTabelaCarrinho() {
-    const produtosCarrinho = obterProdutosDoCarrinho("carrinho");
-    const corpoTabela = document.getElementById("tbody");
-
-    corpoTabela.innerHTML = produtosCarrinho.map(produto => `
-    <tr>
-        <td class="td-produto">
-            <img src="${produto.imagem}" 
-                alt="${produto.nome}" 
-            />
-        </td>
-        <td>${produto.nome}</td>
-        <td class="td-preco-unitario">
-            R$ ${produto.preco.toFixed(2).replace(".", ",")}
-        </td>
-        <td class="td-quantidade">
-            <input type="number" class="input-quantidade" 
-                data-id="${produto.id}" 
-                value="${produto.quantidade}" min="1"
-            >
-        </td>
-        <td class="td-preco-total">
-          R$ ${(produto.preco * produto.quantidade).toFixed(2).replace(".", ",")}
-        </td>
-        <td>
-            <button class="btn-remover" 
-                data-id="${produto.id}" id="deletar">
-            </button>
-        </td>
-    </tr>
-    `).join("");
-};
-
 const corpoTabela = document.getElementById("tbody");
 corpoTabela.addEventListener("click", event => {
     if (event.target.classList.contains("btn-remover")) {
@@ -89,7 +38,7 @@ corpoTabela.addEventListener("click", event => {
     };
 });
 
-corpoTabela.addEventListener("input", event => { 
+corpoTabela.addEventListener("input", event => {
     if (event.target.classList.contains("input-quantidade")) {
         const produtos = obterProdutosDoCarrinho("carrinho");
 
@@ -102,79 +51,6 @@ corpoTabela.addEventListener("input", event => {
         atualizarCarrinhoEtabela();
     }
 });
-
-function removerProdutoDoCarrinho(id) {
-    const produtos = obterProdutosDoCarrinho("carrinho");
-    const carrinhoAtualizado = produtos.filter(produto => produto.id !== id);
-
-    salvarProdutosNoCarrinho("carrinho", carrinhoAtualizado);
-    atualizarCarrinhoEtabela();
-};
-
-function atualizarValorTotalDoCarrinho() {
-    const produtos = obterProdutosDoCarrinho("carrinho");
-
-    const total = produtos.reduce((soma, produto) => {
-        return soma + (produto.preco * produto.quantidade);
-    }, 0);
-
-    document.getElementById("total-carrinho").textContent = `Total: R$ ${total.toFixed(2).replace(".", ",")}`;
-    document.querySelector("#subtotal-pedidos .valor").textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-};
-
-function atualizarCarrinhoEtabela() {
-    atualizarContadorDoCarrinho();
-    renderizerTabelaCarrinho();
-    atualizarValorTotalDoCarrinho();
-};
-
-atualizarCarrinhoEtabela();
-
-async function calcularFrete(cep) {
-    const url = "https://jessica1914tj.app.n8n.cloud/webhook/0319a495-feff-44f8-ad02-0cbe5a039cb5";
-
-    const loading = document.getElementById("loading-frete");
-    loading.style.display = "inline";
-    btnCalcularFrete.disabled = true;
-
-    try {
-        const medidasResponse = await fetch("./js/medidas-produtos.json")
-        const medidas = await medidasResponse.json()
-        const produtos = obterProdutosDoCarrinho("carrinho");
-
-        const products = produtos.map(produto => {
-            const medida = medidas.find(m => m.id === produto.id);
-
-            return {
-                quantity: produto.quantidade,
-                height: medida ? medida.height : 4,
-                length: medida ? medida.length : 30,
-                width: medida ? medida.width : 25,
-                weight: medida ? medida.weight : 0.25
-            }
-        });
-
-        const resposta = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ cep, products })
-        });
-
-        if (!resposta.ok) throw new Error("Erro ao calcular frete");
-
-        const resultado = await resposta.json();
-        return resultado.price;
-
-    } catch (erro) {
-        console.log("Erro ao calcular frete:", erro);
-        return null;
-    } finally {
-        loading.style.display = "none";
-        btnCalcularFrete.disabled = false;
-    }
-};
 
 const btnCalcularFrete = document.getElementById("btn-calcular-frete");
 const inputCep = document.getElementById("input-cep");
@@ -195,7 +71,7 @@ btnCalcularFrete.addEventListener("click", async () => {
         erroCep.style.display = "none";
     }
 
-    const valorFrete = await calcularFrete(cep);
+    const valorFrete = await calcularFrete(cep, btnCalcularFrete,);
 
     if (valorFrete === null) {
         erroCep.textContent = "Erro ao calcular frete. Tente novamente.";
@@ -211,29 +87,3 @@ btnCalcularFrete.addEventListener("click", async () => {
 
     somaValorFreteComSubTotal(valorFrete)
 });
-
-function somaValorFreteComSubTotal(valorFrete) {
-    const subtotalElemento = document.querySelector("#subtotal-pedidos .valor");
-
-    const textoSubtotal = subtotalElemento.textContent
-        .replace("R$", "")
-        .trim();
-
-    const valorSubtotal = parseFloat(textoSubtotal
-        .replace(/\./g, "")
-        .replace(",", ".")
-    );
-
-    const totalComFrete = valorSubtotal + valorFrete;
-    const totalComFreteFormatado = totalComFrete.toLocaleString('pt-BR', {
-        style: 'currency', currency: 'BRL'
-    });
-
-    const totalCarrinhoElemento = document.getElementById("total-carrinho");
-    totalCarrinhoElemento.textContent = `Total: ${totalComFreteFormatado}`;
-};
-
-function validarCep(cep) {
-    const regexCep = /^[0-9]{5}-?[0-9]{3}$/;
-    return regexCep.test(cep);
-};
