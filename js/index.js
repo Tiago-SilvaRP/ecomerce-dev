@@ -41,8 +41,7 @@ function produtoExisteNoCarrinho(carrinho, novoProduto) {
 
 function atualizarContadorDoCarrinho() {
     const carrinho = obterProdutosDoCarrinho("carrinho");
-    let total = 0;
-    carrinho.forEach(item => total += item.quantidade);
+    const total = carrinho.reduce((soma, item) => soma + item.quantidade, 0)
 
     document.getElementById("contador-carrinho").textContent = total;
 };
@@ -90,9 +89,10 @@ corpoTabela.addEventListener("click", event => {
     };
 });
 
-corpoTabela.addEventListener("input", event => {
+corpoTabela.addEventListener("input", event => { 
     if (event.target.classList.contains("input-quantidade")) {
         const produtos = obterProdutosDoCarrinho("carrinho");
+
         const produto = produtos.find(produto => produto.id === event.target.dataset.id);
         let novaQuantidade = parseInt(event.target.value);
         if (produto) {
@@ -144,6 +144,7 @@ async function calcularFrete(cep) {
 
         const products = produtos.map(produto => {
             const medida = medidas.find(m => m.id === produto.id);
+
             return {
                 quantity: produto.quantidade,
                 height: medida ? medida.height : 4,
@@ -164,8 +165,8 @@ async function calcularFrete(cep) {
         if (!resposta.ok) throw new Error("Erro ao calcular frete");
 
         const resultado = await resposta.json();
-
         return resultado.price;
+
     } catch (erro) {
         console.log("Erro ao calcular frete:", erro);
         return null;
